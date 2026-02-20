@@ -1,10 +1,19 @@
+// --- constante: chei localStorage + URL-uri autoload -----------------------
+
 const LS_PORTF = "portfolio_data_v1";
 const LS_WATCH = "watchlist_data_v1";
 const LS_REV   = "revolut_tx_v1";
 
+const AUTOLOAD_PORTF_URL = "./data/Portfolio_Plan_12_Months_Extended.csv";
+const AUTOLOAD_WATCH_URL = "./data/Watchlist_Complementary_Companies.csv";
+
+// --- state ---------------------------------------------------------------
+
 let portfolio = [];
 let watchlist = [];
 let revolutTx = [];
+
+// --- utilitare simple ----------------------------------------------------
 
 const $ = (id) => document.getElementById(id);
 
@@ -15,8 +24,21 @@ const num = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-function setStatus(msg) { $("status").textContent = msg; }
+function setStatus(msg) {
+  const el = $("status");
+  if (el) el.textContent = msg;
+}
 
+// citește CSV remote (pentru autoload din data/)
+async function autoloadCsv(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return [];
+  const text = await res.text();
+  const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+  return parsed.data || [];
+}
+
+// citește fișier din <input> (CSV sau XLSX)
 function parseFile(file, onDone) {
   const ext = file.name.toLowerCase().split(".").pop();
 
@@ -46,24 +68,53 @@ function parseFile(file, onDone) {
   setStatus("Format neacceptat: " + ext);
 }
 
+// --- localStorage --------------------------------------------------------
+
 function saveLocal() {
   localStorage.setItem(LS_PORTF, JSON.stringify(portfolio));
   localStorage.setItem(LS_WATCH, JSON.stringify(watchlist));
-  localStorage.setItem(LS_REV, JSON.stringify(revolutTx));
+  localStorage.setItem(LS_REV,   JSON.stringify(revolutTx));
 }
 
-function restoreLocal() {
+async function restoreLocal() {
   portfolio = JSON.parse(localStorage.getItem(LS_PORTF) || "[]");
   watchlist = JSON.parse(localStorage.getItem(LS_WATCH) || "[]");
-  revolutTx = JSON.parse(localStorage.getItem(LS_REV) || "[]");
+  revolutTx = JSON.parse(localStorage.getItem(LS_REV)   || "[]");
+
+  // dacă nu avem portofoliu salvat local, încercăm să-l luăm din /data
+  if (!portfolio.length) {
+    try {
+      const data = await autoloadCsv(AUTOLOAD_PORTF_URL);
+      if (data.length) {
+        portfolio = data;
+        setStatus("Autoload portofoliu din /data (" + data.length + " rânduri).");
+      }
+    } catch (e) {
+      console.log("Autoload portofoliu eșuat:", e);
+    }
+  } else {
+    setStatus("Restored portofoliu din localStorage.");
+  }
+
+  // dacă nu avem watchlist salvat, încercăm autoload
+  if (!watchlist.length) {
+    try {
+      const data = await autoloadCsv(AUTOLOAD_WATCH_URL);
+      if (data.length) {
+        watchlist = data;
+      }
+    } catch (e) {
+      console.log("Autoload watchlist eșuat:", e);
+    }
+  }
 
   if (portfolio.length) {
-    setStatus("Restored portofoliu din localStorage.");
     refreshAll();
   }
   if (watchlist.length) renderWatchlist();
   if (revolutTx.length) {
-    $("revStatus").textContent = "Restored Revolut: " + revolutTx.length + " tranzacții.";
+    $("revStatus").textContent =
+      "Restored Revolut: " + revolutTx.length + " tranzacții.";
     drawRevolutCharts();
   }
 }
@@ -72,13 +123,16 @@ function clearLocal() {
   localStorage.removeItem(LS_PORTF);
   localStorage.removeItem(LS_WATCH);
   localStorage.removeItem(LS_REV);
-  portfolio = []; watchlist = []; revolutTx = [];
-  $("watchTable").innerHTML = "Încarcă fișierul watchlist.";
+  portfolio = [];
+  watchlist = [];
+  revolutTx = [];
+  const watchEl = $("watchTable");
+  if (watchEl) watchEl.innerHTML = "Încarcă fișierul watchlist.";
   $("revStatus").textContent = "Revolut CSV neîncărcat încă.";
   setStatus("Curățat. Reîncarcă fișierele.");
 }
 
-// ---- KPI & charts din fișierul de portofoliu ----
+// --- KPI & grafice pentru portofoliu -------------------------------------
 
 function groupSum(rows, groupKey, valueKey) {
   const map = new Map();
@@ -92,12 +146,12 @@ function groupSum(rows, groupKey, valueKey) {
 
 function updateKPIs() {
   const totalValue = portfolio.reduce((s, r) => s + num(r.Current_Value_EUR), 0);
-  const totalDiv = portfolio.reduce((s, r) => s + num(r.Total_Dividend_2026_EUR), 0);
-  const yieldPct = totalValue > 0 ? (totalDiv / totalValue * 100) : 0;
+  const totalDiv   = portfolio.reduce((s, r) => s + num(r.Total_Dividend_2026_EUR), 0);
+  const yieldPct   = totalValue > 0 ? (totalDiv / totalValue * 100) : 0;
 
   $("kpiValue").textContent = totalValue.toFixed(2) + " EUR";
-  $("kpiDiv").textContent = totalDiv.toFixed(2) + " EUR";
-  $("kpiYield").textContent = yieldPct.toFixed(2) + "%";
+  $("kpiDiv").textContent   = totalDiv.toFixed(2)   + " EUR";
+  $("kpiYield").textContent = yieldPct.toFixed(2)   + "%";
 }
 
 function drawBucketChart() {
@@ -157,12 +211,12 @@ function drawSignalChart() {
 function simulate12m() {
   if (!portfolio.length) return;
 
-  const monthly = num($("monthly").value);
-  const rAnnual = num($("annualReturn").value) / 100;
-  const reinvest = $("reinvest").value === "yes";
+  const monthly   = num($("monthly").value);
+  const rAnnual   = num($("annualReturn").value) / 100;
+  const reinvest  = $("reinvest").value === "yes";
 
   const startValue = portfolio.reduce((s, r) => s + num(r.Current_Value_EUR), 0);
-  const div2026 = portfolio.reduce((s, r) => s + num(r.Total_Dividend_2026_EUR), 0);
+  const div2026    = portfolio.reduce((s, r) => s + num(r.Total_Dividend_2026_EUR), 0);
   const divMonthly = reinvest ? (div2026 / 12) : 0;
 
   const rMonthly = Math.pow(1 + rAnnual, 1/12) - 1;
@@ -216,16 +270,16 @@ function renderWatchlist() {
   $("watchTable").innerHTML = html;
 }
 
-// ---- Grafice din CSV Revolut ----
+// --- grafice din CSV Revolut ---------------------------------------------
 
 function drawRevolutCharts() {
   if (!revolutTx.length) return;
 
-  // cash flow pe luni
+  // cash flow pe luni (top-up + withdrawal)
   const byMonth = new Map();
   revolutTx.forEach(r => {
     const type = r.Type || "";
-    const tot = (r["Total Amount"] || "").replace("EUR","").replace("USD","").trim();
+    const tot  = (r["Total Amount"] || "").replace("EUR","").replace("USD","").trim();
     const amount = num(tot);
     const date = (r.Date || "").slice(0,7); // YYYY-MM
 
@@ -252,13 +306,13 @@ function drawRevolutCharts() {
     yaxis: {title: "Cash net"}
   });
 
-  // dividende total per ticker
+  // dividende total per ticker (life-time)
   const divMap = new Map();
   revolutTx.forEach(r => {
     const type = r.Type || "";
     if (!type.includes("DIVIDEND")) return;
     const ticker = r.Ticker || "NA";
-    const tot = (r["Total Amount"] || "").replace("EUR","").replace("USD","").trim();
+    const tot    = (r["Total Amount"] || "").replace("EUR","").replace("USD","").trim();
     const amount = num(tot);
     divMap.set(ticker, (divMap.get(ticker) || 0) + amount);
   });
@@ -282,7 +336,7 @@ function drawRevolutCharts() {
   });
 }
 
-// ---- Event handlers ----
+// --- event handlers ------------------------------------------------------
 
 $("filePortfolio").addEventListener("change", (e) => {
   const file = e.target.files?.[0];
@@ -317,23 +371,27 @@ $("fileRevolut").addEventListener("change", (e) => {
     skipEmptyLines: true,
     complete: (res) => {
       revolutTx = res.data || [];
-      $("revStatus").textContent = "Revolut: " + revolutTx.length + " tranzacții încărcate. Salvat local.";
+      $("revStatus").textContent =
+        "Revolut: " + revolutTx.length + " tranzacții încărcate. Salvat local.";
       saveLocal();
       drawRevolutCharts();
     }
   });
 });
 
-$("btnRestore").addEventListener("click", restoreLocal);
-$("btnClear").addEventListener("click", clearLocal);
+$("btnRestore").addEventListener("click", () => { restoreLocal(); });
+$("btnClear").addEventListener("click", () => { clearLocal(); });
 
 ["monthly","annualReturn","reinvest"].forEach(id => {
   $(id).addEventListener("input", simulate12m);
   $(id).addEventListener("change", simulate12m);
 });
 
-// auto-restore on load
-restoreLocal();
+// --- init ----------------------------------------------------------------
+
+window.addEventListener("load", () => {
+  restoreLocal();
+});
 
 function refreshAll() {
   if (!portfolio.length) return;

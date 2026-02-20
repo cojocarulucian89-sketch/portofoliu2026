@@ -1,0 +1,30 @@
+﻿Ticker,Company,Region,Bucket,Current_Shares,Current_Price_EUR,Ideal_Buy_Price_EUR,Discount_%,Buy_Signal,Dividend_Yield_%,WHT_Tax_%,Net_Dividend_Yield_%,Target_Weight_%,Priority,Safety_Score,Growth_Potential,Current_Value_EUR
+PRAZ,Amundi Prime Eurozone ETF,Europa,ETF,13.93,35.3,33.0,6.5,WAIT,2.4,0,2.4,15.0,ALTA,9,7,491.7289999999999
+6TVM,Amundi S&P 500 II ETF,USA/Global,ETF,2.01,60.57,57.0,5.9,WAIT,1.0,0,1.0,10.0,ALTA,9,8,121.74569999999999
+BNP,BNP Paribas,Europa,Dividend Defensiv EUR,5.0,93.84,85.0,9.4,WAIT,4.4,15,3.74,4.0,ALTA,8,6,469.20000000000005
+ASR,ASR Nederland,Europa,Dividend Defensiv EUR,4.0,61.64,58.0,5.9,WAIT,5.2,15,4.42,3.0,ALTA,8,5,246.56
+VPK5,Vopak,Europa,Dividend Defensiv EUR,6.0,44.3,41.0,7.4,WAIT,4.5,15,3.82,3.0,ALTA,8,5,265.79999999999995
+GI6A,Gecina,Europa,Dividend Defensiv EUR,5.0,75.78,70.0,7.6,WAIT,6.5,28,4.68,3.0,MEDIE,7,5,378.9
+N4SA,Eurocommercial Properties,Europa,Dividend Defensiv EUR,17.0,27.1,25.0,7.7,WAIT,7.0,15,5.95,3.0,MEDIE,7,6,460.70000000000005
+AACA,Aalberts,Europa,Dividend Defensiv EUR,11.0,34.8,32.0,8.0,WAIT,3.8,15,3.23,2.0,ALTA,8,6,382.79999999999995
+AHOG,Ahold Delhaize,Europa,Dividend Defensiv EUR,8.0,39.59,37.0,6.5,WAIT,3.5,15,2.98,2.0,MEDIE,9,5,316.72
+1WE,La Francaise des Jeux,Europa,Dividend Defensiv EUR,11.0,24.56,23.0,6.4,WAIT,4.8,28,3.46,2.0,MEDIE,9,5,270.15999999999997
+SHL,Siemens Healthineers,Europa,Quality Growth EUR,9.0,41.39,38.0,8.2,WAIT,1.8,26,1.33,2.0,MEDIE,8,7,372.51
+CGM,Capgemini,Europa,Quality Growth EUR,4.0,104.7,95.0,9.3,WAIT,2.6,28,1.87,2.0,MEDIE,7,7,418.8
+AFR0,Air France-KLM,Europa,Ciclic/Speculativ,60.0,12.66,11.5,9.2,WAIT,0.0,28,0.0,4.0,NU CRESTE,5,7,759.6
+LHA,Deutsche Lufthansa,Europa,Ciclic/Speculativ,176.0,9.1,8.5,6.6,WAIT,3.3,26,2.44,4.0,NU CRESTE,5,6,1601.6
+1TY,Prosus,Europa,Quality Growth EUR,9.0,43.65,40.0,8.4,WAIT,0.0,15,0.0,2.0,JOASA,6,8,392.84999999999997
+QSV,Edenred,Europa,Dividend Defensiv EUR,14.0,17.99,16.5,8.3,WAIT,3.8,28,2.74,1.5,JOASA,7,6,251.85999999999999
+RCF,Teleperformance,Europa,Ciclic/Speculativ,3.0,51.85,48.0,7.4,WAIT,2.0,28,1.44,1.0,NU CRESTE,6,6,155.55
+RIOT,Riot Platforms,Europa,Ciclic/Speculativ,49.0,13.78,12.0,12.9,WAIT,0.0,15,0.0,2.0,NU CRESTE,3,9,675.2199999999999
+SAN.PA,Sanofi (EUR),Europa,Dividend Defensiv EUR,2.0,92.5,87.0,5.9,WAIT,4.5,28,3.24,2.0,MEDIE,9,6,185.0
+VICI,VICI Properties,USA,Dividend Defensiv USD,25.0,26.5,24.5,7.5,WAIT,6.4,15,5.44,4.0,ALTA,8,6,662.5
+OKE,ONEOK,USA,Dividend Defensiv USD,5.0,72.4,68.0,6.1,WAIT,5.6,15,4.76,3.0,ALTA,8,6,362.0
+UPS,UPS,USA,Dividend Defensiv USD,5.0,122.0,115.0,5.7,WAIT,6.0,15,5.1,3.0,ALTA,8,5,610.0
+SNY,Sanofi (USD),USA,Dividend Defensiv USD,10.0,48.0,45.0,6.2,WAIT,4.5,15,3.82,3.0,ALTA,9,6,480.0
+MSFT,Microsoft,USA,Quality Growth USD,2.0,398.0,375.0,5.8,WAIT,0.7,15,0.6,3.0,MEDIE,9,8,796.0
+UNH,UnitedHealth,USA,Quality Growth USD,2.0,456.0,430.0,5.7,WAIT,1.2,15,1.02,3.0,MEDIE,9,7,912.0
+ABT,Abbott Labs,USA,Quality Growth USD,3.0,98.0,92.0,6.1,WAIT,1.9,15,1.62,2.0,MEDIE,9,7,294.0
+DELL,Dell Technologies,USA,Quality Growth USD,4.0,68.0,63.0,7.4,WAIT,0.0,15,0.0,2.0,MEDIE,7,7,272.0
+IBM,IBM,USA,Dividend Defensiv USD,1.0,182.0,170.0,6.6,WAIT,4.5,15,3.82,1.5,JOASA,8,5,182.0
+MDLZ,Mondelez,USA,Dividend Defensiv USD,5.0,56.0,52.0,7.1,WAIT,2.8,15,2.38,1.5,JOASA,9,5,280.0

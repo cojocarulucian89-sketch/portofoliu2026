@@ -4,8 +4,8 @@ const LS_PORTF = "portfolio_data_v1";
 const LS_WATCH = "watchlist_data_v1";
 const LS_REV   = "revolut_tx_v1";
 
-const AUTOLOAD_PORTF_URL = "./data/Portfolio_Plan_12_Months_Extended.csv";
-const AUTOLOAD_WATCH_URL = "./data/Watchlist_Complementary_Companies.csv";
+const AUTOLOAD_PORTF_URL = "./data/Portfolio_Plan_12_Months.csv";
+const AUTOLOAD_WATCH_URL = "./data/Watchlist_Complementary_Companies.xlsx"; // acceptăm xlsx
 
 // --- state ---------------------------------------------------------------
 
@@ -36,6 +36,16 @@ async function autoloadCsv(url) {
   const text = await res.text();
   const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
   return parsed.data || [];
+}
+
+// citește XLSX remote (pentru watchlist .xlsx)
+async function autoloadXlsx(url) {
+  const res = await fetch(url);
+  if (!res.ok) return [];
+  const buf = await res.arrayBuffer();
+  const wb = XLSX.read(buf, { type: "array" });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(ws, { defval: "" });
 }
 
 // citește fișier din <input> (CSV sau XLSX)
@@ -99,7 +109,7 @@ async function restoreLocal() {
   // dacă nu avem watchlist salvat, încercăm autoload
   if (!watchlist.length) {
     try {
-      const data = await autoloadCsv(AUTOLOAD_WATCH_URL);
+      const data = await autoloadXlsx(AUTOLOAD_WATCH_URL);
       if (data.length) {
         watchlist = data;
       }
@@ -146,12 +156,16 @@ function groupSum(rows, groupKey, valueKey) {
 
 function updateKPIs() {
   const totalValue = portfolio.reduce((s, r) => s + num(r.Current_Value_EUR), 0);
-  const totalDiv   = portfolio.reduce((s, r) => s + num(r.Total_Dividend_2026_EUR), 0);
-  const yieldPct   = totalValue > 0 ? (totalDiv / totalValue * 100) : 0;
+  // deocamdată nu avem Total_Dividend_2026_EUR în fișier; folosim yield mediu brut estimat
+  const totalDivEst = portfolio.reduce(
+    (s, r) => s + num(r.Current_Value_EUR) * num(r.Dividend_Yield_%) / 100,
+    0
+  );
+  const yieldPct = totalValue > 0 ? (totalDivEst / totalValue * 100) : 0;
 
   $("kpiValue").textContent = totalValue.toFixed(2) + " EUR";
-  $("kpiDiv").textContent   = totalDiv.toFixed(2)   + " EUR";
-  $("kpiYield").textContent = yieldPct.toFixed(2)   + "%";
+  $("kpiDiv").textContent   = totalDivEst.toFixed(2)   + " EUR (estimat)";
+  $("kpiYield").textContent = yieldPct.toFixed(2)      + "%";
 }
 
 function drawBucketChart() {
@@ -216,8 +230,11 @@ function simulate12m() {
   const reinvest  = $("reinvest").value === "yes";
 
   const startValue = portfolio.reduce((s, r) => s + num(r.Current_Value_EUR), 0);
-  const div2026    = portfolio.reduce((s, r) => s + num(r.Total_Dividend_2026_EUR), 0);
-  const divMonthly = reinvest ? (div2026 / 12) : 0;
+  const totalDivEst = portfolio.reduce(
+    (s, r) => s + num(r.Current_Value_EUR) * num(r.Dividend_Yield_%) / 100,
+    0
+  );
+  const divMonthly = reinvest ? (totalDivEst / 12) : 0;
 
   const rMonthly = Math.pow(1 + rAnnual, 1/12) - 1;
 
@@ -275,7 +292,6 @@ function renderWatchlist() {
 function drawRevolutCharts() {
   if (!revolutTx.length) return;
 
-  // cash flow pe luni (top-up + withdrawal)
   const byMonth = new Map();
   revolutTx.forEach(r => {
     const type = r.Type || "";
@@ -306,7 +322,6 @@ function drawRevolutCharts() {
     yaxis: {title: "Cash net"}
   });
 
-  // dividende total per ticker (life-time)
   const divMap = new Map();
   revolutTx.forEach(r => {
     const type = r.Type || "";

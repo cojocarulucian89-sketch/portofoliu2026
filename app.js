@@ -5,7 +5,7 @@ const LS_WATCH = "watchlist_data_v1";
 const LS_REV   = "revolut_tx_v1";
 
 const AUTOLOAD_PORTF_URL = "./data/Portfolio_Plan_12_Months.csv";
-const AUTOLOAD_WATCH_URL = "./data/Watchlist_Complementary_Companies.xlsx"; // acceptăm xlsx
+const AUTOLOAD_WATCH_URL = "./data/Watchlist_Complementary_Companies.xlsx";
 
 // --- state ---------------------------------------------------------------
 
@@ -156,7 +156,6 @@ function groupSum(rows, groupKey, valueKey) {
 
 function updateKPIs() {
   const totalValue = portfolio.reduce((s, r) => s + num(r.Current_Value_EUR), 0);
-  // deocamdată nu avem Total_Dividend_2026_EUR în fișier; folosim yield mediu brut estimat
   const totalDivEst = portfolio.reduce(
     (s, r) => s + num(r.Current_Value_EUR) * num(r.Dividend_Yield_%) / 100,
     0
@@ -263,6 +262,8 @@ function simulate12m() {
     yaxis: {title: "Valoare (EUR)"}
   });
 }
+
+// --- Watchlist -----------------------------------------------------------
 
 function renderWatchlist() {
   if (!watchlist.length) return;

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio Dashboard</title>
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- CSV -->
+  <script src="https://unpkg.com/papaparse@5.5.3/papaparse.min.js"></script>
+  <!-- XLSX -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Charts -->
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+</head>
+
+<body>
+  <header class="header">
+    <div>
+      <h1>Portfolio Dashboard</h1>
+      <div class="muted">CSV/XLSX + Revolut CSV • grafice + simulări • salvare locală</div>
+    </div>
+    <div class="actions">
+      <button id="btnRestore" class="btn">Restore</button>
+      <button id="btnClear" class="btn btnDanger">Clear</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Fișiere de intrare</h2>
+
+      <label class="label">Portofoliu (Portfolio_Plan_12_Months_Extended CSV/XLSX)</label>
+      <input id="filePortfolio" class="input" type="file" accept=".csv,.xlsx" />
+
+      <label class="label">Watchlist (Watchlist_Complementary_Companies CSV/XLSX)</label>
+      <input id="fileWatchlist" class="input" type="file" accept=".csv,.xlsx" />
+
+      <label class="label">Istoric Revolut (CSV exportat din aplicație)</label>
+      <input id="fileRevolut" class="input" type="file" accept=".csv" />
+      <div id="revStatus" class="status muted small">Revolut CSV neîncărcat încă.</div>
+
+      <hr />
+
+      <div class="row">
+        <div class="col">
+          <label class="label">Contribuție lunară (EUR)</label>
+          <input id="monthly" class="input" type="number" value="1000" step="50" min="0" />
+        </div>
+        <div class="col">
+          <label class="label">Randament anual (%)</label>
+          <input id="annualReturn" class="input" type="number" value="7" step="0.5" min="-50" max="50" />
+        </div>
+        <div class="col">
+          <label class="label">Reinvest dividende</label>
+          <select id="reinvest" class="input">
+            <option value="yes" selected>Da</option>
+            <option value="no">Nu</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="status" class="status muted small">Niciun fișier portofoliu încărcat.</div>
+    </section>
+
+    <section class="card">
+      <h2>KPI portofoliu</h2>
+      <div class="kpiGrid">
+        <div class="kpi">
+          <div class="muted small">Valoare curentă</div>
+          <div id="kpiValue" class="kpiValue">—</div>
+        </div>
+        <div class="kpi">
+          <div class="muted small">Dividende 2026 brut</div>
+          <div id="kpiDiv" class="kpiValue">—</div>
+        </div>
+        <div class="kpi">
+          <div class="muted small">Yield brut</div>
+          <div id="kpiYield" class="kpiValue">—</div>
+        </div>
+      </div>
+      <div id="simChart" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <h2>Alocare pe bucket</h2>
+      <div id="bucketChart" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <h2>Top 10 poziții</h2>
+      <div id="topChart" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <h2>Buy signal</h2>
+      <div id="signalChart" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <h2>Watchlist complementar</h2>
+      <div id="watchTable" class="tableWrap muted">Încarcă fișierul watchlist.</div>
+    </section>
+
+    <section class="card">
+      <h2>Cash flow Revolut (lunar)</h2>
+      <div id="cashFlowChart" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <h2>Dividende life‑time (Revolut)</h2>
+      <div id="divByTickerChart" class="chart"></div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
